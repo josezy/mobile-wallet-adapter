@@ -9,11 +9,11 @@ export default function useGuardedCallback<TArgs extends Array<any>, TReturn>(
   const setSnackbarProps = useContext(SnackbarContext);
   return useCallback(
     async (...args: TArgs) => {
-      try {
+      // try {
         return await cb(...args);
-      } catch (e: any) {
-        setSnackbarProps({children: `${e.name}: ${e.message}`});
-      }
+      // } catch (e: any) {
+      //   setSnackbarProps({children: `${e.name}: ${e.message}`});
+      // }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     dependencies || [],

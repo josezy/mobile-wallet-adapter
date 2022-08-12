@@ -3,6 +3,7 @@ import {ScrollView, StyleSheet} from 'react-native';
 import {Appbar, Divider, Portal, Text, TextInput} from 'react-native-paper';
 
 import AccountInfo from '../components/AccountInfo';
+import MintTokenButton from '../components/MintTokenButton';
 import RecordMessageButton from '../components/RecordMessageButton';
 import SignMessageButton from '../components/SignMessageButton';
 import useAuthorization from '../utils/useAuthorization';
@@ -35,6 +36,9 @@ export default function MainScreen() {
           </RecordMessageButton>
           <Divider style={styles.spacer} />
           <SignMessageButton message={memoText}>Sign Message</SignMessageButton>
+          <Divider style={styles.spacer} />
+          <MintTokenButton />
+
         </ScrollView>
         {accounts && selectedAccount ? (
           <AccountInfo

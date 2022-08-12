@@ -62,7 +62,7 @@ function getPublicKeyFromAddress(address: Base64EncodedAddress): PublicKey {
 }
 
 export const APP_IDENTITY = {
-  name: 'React Native dApp',
+  name: 'Monadical dApp',
 };
 
 export default function useAuthorization() {

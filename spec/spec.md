@@ -16,7 +16,7 @@ Please don't introduce unnecessary line breaks in this specification - it's diff
 
 This specification uses [semantic versioning](https://en.wikipedia.org/wiki/Software_versioning#Semantic_versioning)
 
-**Version: 0.3.3**
+**Version: 0.9.0**
 
 ## Changelog
 
@@ -29,6 +29,7 @@ This specification uses [semantic versioning](https://en.wikipedia.org/wiki/Soft
 | 0.3.1   | Enforce HTTPS for endpoint-specific URIs                                                                                            |
 | 0.3.2   | Replace timeout placeholders with minimum timeouts                                                                                  |
 | 0.3.3   | `sign_messages` should take multiple addresses for signing (for parity with `sign_transactions` behavior)                           |
+| 0.9.0   | Advancing spec version to 0.9.0 (near-final version)                                                                                |
 
 # Non-normative front matter
 
@@ -145,7 +146,7 @@ Whether launched from a web browser or a native dapp endpoint, the Intent’s ac
 
 #### iOS
 
-__TODO__
+_iOS support is planned for a future version of this specification_
 
 #### Desktop
 
@@ -930,7 +931,7 @@ When the wallet determines that an origin attestation is necessary, it returns t
 
 ### iOS
 
-__TODO__
+_iOS support is planned for a future version of this specification_
 
 ### Remote
 

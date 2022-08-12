@@ -90,6 +90,7 @@ class MobileWalletAdapterViewModel(application: Application) : AndroidViewModel(
                 Log.d(TAG, "Generated a new keypair (pub=${publicKey.encoded.contentToString()}) for authorize request")
                 request.request.completeWithAuthorize(
                     publicKey.encoded,
+                    "fakewallet",
                     null,
                     request.sourceVerificationState.authorizationScope.encodeToByteArray()
                 )

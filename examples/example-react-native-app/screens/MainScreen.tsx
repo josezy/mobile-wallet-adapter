@@ -3,9 +3,11 @@ import {ScrollView, StyleSheet} from 'react-native';
 import {Appbar, Divider, Portal, Text, TextInput} from 'react-native-paper';
 
 import AccountInfo from '../components/AccountInfo';
+import VerifyNFTOwnershipButton from '../components/VerifyNFTOwnershipButton';
 import RecordMessageButton from '../components/RecordMessageButton';
 import SignMessageButton from '../components/SignMessageButton';
 import useAuthorization from '../utils/useAuthorization';
+import { PublicKey } from '@solana/web3.js';
 
 export default function MainScreen() {
   const {accounts, onChangeAccount, selectedAccount} = useAuthorization();
@@ -35,6 +37,10 @@ export default function MainScreen() {
           </RecordMessageButton>
           <Divider style={styles.spacer} />
           <SignMessageButton message={memoText}>Sign Message</SignMessageButton>
+
+          <Divider style={styles.spacer} />
+          <VerifyNFTOwnershipButton mint={new PublicKey(0)} />
+
         </ScrollView>
         {accounts && selectedAccount ? (
           <AccountInfo

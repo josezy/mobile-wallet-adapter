@@ -73,14 +73,14 @@ export default function QRNFT({ children, mint }: Props) {
 
   return (
     <>
-      <View style={styles.buttonGroup}>
+      <View style={styles.nftContainer}>
         <TouchableHighlight
           onPress={async () => {
             // TODO: generate QR
             // setQrImage('https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png')
             setShowDialog(true)
           }}
-          // style={{ width: '100%' }}
+          style={{ borderRadius: 10 }}
         >
           <Image
             style={styles.nft_image}
@@ -115,17 +115,13 @@ const styles = StyleSheet.create({
     flex: 1,
     marginEnd: 8,
   },
-  buttonGroup: {
-    // display: 'flex',
-    // flexDirection: 'row',
-    // width: '100%',
+  nftContainer: {
+    width: '50%',
+    padding: 5,
   },
   nft_image: {
-    width: 120,
-    height: 120,
-  },
-  qr_image: {
-    width: 280,
-    height: 280,
+    width: '100%',
+    aspectRatio: 1,
+    borderRadius: 10,
   },
 });

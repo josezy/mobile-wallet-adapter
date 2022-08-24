@@ -1,20 +1,9 @@
-// import axios from 'axios'
-// import bs58 from 'bs58'
-// import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
-// import { useConnection } from '@solana/wallet-adapter-react';
-import {
-  PublicKey,
-  // RpcResponseAndContext,
-  // SignatureResult,
-  // Transaction,
-  // TransactionInstruction,
-} from '@solana/web3.js';
-// import { transact } from '@solana-mobile/mobile-wallet-adapter-protocol-web3js';
 import React, { useContext, useState } from 'react';
 import { Image, Linking, StyleSheet, TouchableHighlight, View } from 'react-native';
 import { Button, Dialog, Paragraph, Portal, Text } from 'react-native-paper';
 // import { TextEncoder } from 'text-encoding';
 import QRCode from 'react-native-qrcode-svg';
+import { INFT } from './NFTGrid';
 
 // import useAuthorization from '../utils/useAuthorization';
 // import useGuardedCallback from '../utils/useGuardedCallback';
@@ -23,15 +12,15 @@ import QRCode from 'react-native-qrcode-svg';
 
 type Props = Readonly<{
   children?: React.ReactNode;
-  mint: PublicKey,
+  nft: INFT,
 }>;
 
-export default function QRNFT({ children, mint }: Props) {
+export default function QRNFT({ children, nft }: Props) {
   // const { authorizeSession, selectedAccount } = useAuthorization();
   // const { connection } = useConnection();
   // const setSnackbarProps = useContext(SnackbarContext);
   const [showDialog, setShowDialog] = useState(false);
-  // const [qrImage, setQrImage] = useState('');
+  const [qrString, setQrString] = useState('');
 
   // const guardedCallback = useGuardedCallback(
   //   async (): Promise<boolean> => {
@@ -76,17 +65,15 @@ export default function QRNFT({ children, mint }: Props) {
       <View style={styles.nftContainer}>
         <TouchableHighlight
           onPress={async () => {
-            // TODO: generate QR
-            // setQrImage('https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png')
+            // TODO: sign message wallet:mint with guardedCallback
+            setQrString(nft.mint)
             setShowDialog(true)
           }}
           style={{ borderRadius: 10 }}
         >
           <Image
             style={styles.nft_image}
-            source={{
-              uri: 'https://arweave.net/WK2BBHga5vjvllMuosAPJBFRm1xdS6SAxqmi2_atj7M?ext=png',
-            }}
+            source={{ uri: nft.image }}
           />
         </TouchableHighlight>
       </View>
@@ -97,7 +84,7 @@ export default function QRNFT({ children, mint }: Props) {
           onDismiss={() => setShowDialog(false)}
         >
           <Dialog.Content>
-            <QRCode value={mint.toString()} size={280} />
+            <QRCode value={qrString} size={280} />
             <Dialog.Actions>
               <Button onPress={() => setShowDialog(false)}>
                 Close

@@ -4,13 +4,13 @@ import {Appbar, Divider, Portal, Text, TextInput} from 'react-native-paper';
 
 import AccountInfo from '../components/AccountInfo';
 import MintTokenButton from '../components/MintTokenButton';
-import RecordMessageButton from '../components/RecordMessageButton';
-import SignMessageButton from '../components/SignMessageButton';
+// import RecordMessageButton from '../components/RecordMessageButton';
+// import SignMessageButton from '../components/SignMessageButton';
 import useAuthorization from '../utils/useAuthorization';
 
 export default function MainScreen() {
   const {accounts, onChangeAccount, selectedAccount} = useAuthorization();
-  const [memoText, setMemoText] = useState('');
+  // const [memoText, setMemoText] = useState('');
   return (
     <>
       <Appbar.Header elevated mode="center-aligned">
@@ -19,9 +19,9 @@ export default function MainScreen() {
       <Portal.Host>
         <ScrollView contentContainerStyle={styles.container}>
           <Text variant="bodyLarge">
-            Write a message to record on the blockchain.
+            Welcome to my awesome candy machine
           </Text>
-          <Divider style={styles.spacer} />
+          {/* <Divider style={styles.spacer} />
           <TextInput
             label="What's on your mind?"
             onChangeText={text => {
@@ -35,7 +35,7 @@ export default function MainScreen() {
             Record Message
           </RecordMessageButton>
           <Divider style={styles.spacer} />
-          <SignMessageButton message={memoText}>Sign Message</SignMessageButton>
+          <SignMessageButton message={memoText}>Sign Message</SignMessageButton> */}
           <Divider style={styles.spacer} />
           <MintTokenButton />
 

@@ -1,32 +1,23 @@
-import {WalletAdapterNetwork} from '@solana/wallet-adapter-base';
 import {useConnection} from '@solana/wallet-adapter-react';
-import {
-  PublicKey,
-  RpcResponseAndContext,
-  SignatureResult,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js';
+import { PublicKey, SignatureResult, Transaction, RpcResponseAndContext } from '@solana/web3.js';
 import {transact} from '@solana-mobile/mobile-wallet-adapter-protocol-web3js';
 import React, {useContext, useState} from 'react';
 import {Linking, StyleSheet, View} from 'react-native';
 import {Button, Dialog, Paragraph, Portal} from 'react-native-paper';
-import {TextEncoder} from 'text-encoding';
 
 import useAuthorization from '../utils/useAuthorization';
 import useGuardedCallback from '../utils/useGuardedCallback';
 import {SnackbarContext} from './SnackbarProvider';
 
 import { Web3MobileWallet } from '@solana-mobile/mobile-wallet-adapter-protocol-web3js';
-import { getCandyMachineState, mintOneToken } from '../cmui/candy-machine';
-
-// import * as anchor from '../anchor/dist/browser/index'
+import axios from 'axios';
+import bs58 from 'bs58';
 
 type Props = Readonly<{
   children?: React.ReactNode;
 }>;
 
-const candyMachineId = new PublicKey("2JuHo7foN4ybZRUssESKmTBhVPhCa95v6odG7T1UDMWU")
+const HELPER_API = 'http://192.168.1.58:3000/api/mint-nft'
 
 export default function MintTokenButton({children}: Props) {
   const {authorizeSession, selectedAccount} = useAuthorization();
@@ -34,77 +25,25 @@ export default function MintTokenButton({children}: Props) {
   // const setSnackbarProps = useContext(SnackbarContext);
   // const [recordMessageTutorialOpen, setRecordMessageTutorialOpen] = useState(false);
   // const [recordingInProgress, setRecordingInProgress] = useState(false);
+
   const mintTokenGuarded = useGuardedCallback(
-    // async (): Promise<[string, RpcResponseAndContext<SignatureResult>]> => {
-    async (): Promise<void> => {
-      const chucha = await transact(async (wallet: Web3MobileWallet) => {
-        const [freshAccount, latestBlockhash] = await Promise.all([
-          authorizeSession(wallet),
-          connection.getLatestBlockhash(),
-        ]);
+    async (): Promise<[string, RpcResponseAndContext<SignatureResult>]> => {
+      const [signature] = await transact(async (wallet: Web3MobileWallet) => {
+        const freshAccount = await authorizeSession(wallet)
+        const owner = selectedAccount?.publicKey ?? freshAccount.publicKey
 
-        const lePK = selectedAccount?.publicKey ?? freshAccount.publicKey
-        const anchorWallet = {
-          publicKey: lePK,
-          // signAllTransactions: wallet.signAllTransactions,
-          // signTransaction: wallet.signTransaction,
-          signAllTransactions: async (txs: Transaction[]) => await wallet.signTransactions({transactions: txs}),
-          signTransaction: async (tx: Transaction) => (await wallet.signTransactions({transactions: [tx]}))[0],
-        } as any // Intentional, to remind you about the anchor version mismatch
+        const res = await axios.get(HELPER_API, {
+          params: { owner: owner.toString() }
+        })
+        const transaction = Transaction.from(bs58.decode(res.data.data.transaction))
+        console.log("transaction", transaction)
 
-        console.log("el hijo", anchorWallet)
-        console.log("gonorrea", candyMachineId)
-
-        const candyMachine = await getCandyMachineState(
-          anchorWallet,
-          candyMachineId,
-          connection
-        );
-
-        console.log("wallet.publicKey", wallet.publicKey)
-
-        const mintResult = await mintOneToken(
-          candyMachine,
-          lePK,
-          // beforeTransactions,
-          // afterTransactions,
-          // setupMint ?? setupTxn
-        );
-
-        console.log("mintResult", mintResult)
-
-        return "5678"
+        return await wallet.signAndSendTransactions({
+          transactions: [transaction],
+        });
       })
-      console.log("1234", chucha)
-      // const [signature] = await transact(async wallet => {
-      //   console.log("hehehe", wallet)
-      //   // const [freshAccount, latestBlockhash] = await Promise.all([
-      //   //   authorizeSession(wallet),
-      //   //   connection.getLatestBlockhash(),
-      //   // ]);
-      //   // const memoProgramTransaction = new Transaction({
-      //   //   ...latestBlockhash,
-      //   //   feePayer:
-      //   //     // Either the public key that was already selected when this method was called...
-      //   //     selectedAccount?.publicKey ??
-      //   //     // ...or the newly authorized public key.
-      //   //     freshAccount.publicKey,
-      //   // }).add(
-      //   //   new TransactionInstruction({
-      //   //     data: messageBuffer,
-      //   //     keys: [],
-      //   //     programId: new PublicKey(
-      //   //       'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr',
-      //   //     ),
-      //   //   }),
-      //   // );
-      //   // return await wallet.signAndSendTransactions({
-      //   //   connection,
-      //   //   transactions: [memoProgramTransaction],
-      //   // });
-      //   return ["signature"]
-      // });
-      // return [signature, await connection.confirmTransaction(signature)];
+      console.log("signature", signature)
+      return [signature, await connection.confirmTransaction(signature)]
     },
     [authorizeSession, connection, selectedAccount],
   );
@@ -115,10 +54,12 @@ export default function MintTokenButton({children}: Props) {
         <Button
           onPress={async () => {
             const result = await mintTokenGuarded();
+            console.log("result", result)
           }}
           mode="contained"
-          style={styles.actionButton}>
-          My pinche btn
+          style={styles.actionButton}
+        >
+          Mint NFT
         </Button>
       </View>
     </>

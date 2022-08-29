@@ -36,13 +36,11 @@ export default function MintTokenButton({children}: Props) {
           params: { owner: owner.toString() }
         })
         const transaction = Transaction.from(bs58.decode(res.data.data.transaction))
-        console.log("transaction", transaction)
-
         return await wallet.signAndSendTransactions({
           transactions: [transaction],
         });
       })
-      console.log("signature", signature)
+
       return [signature, await connection.confirmTransaction(signature)]
     },
     [authorizeSession, connection, selectedAccount],

@@ -4,6 +4,7 @@ import {Appbar, Divider, Portal, Text, TextInput} from 'react-native-paper';
 
 import AccountInfo from '../components/AccountInfo';
 import MintTokenButton from '../components/MintTokenButton';
+import NFTGrid from '../components/NFTGrid';
 // import RecordMessageButton from '../components/RecordMessageButton';
 // import SignMessageButton from '../components/SignMessageButton';
 import useAuthorization from '../utils/useAuthorization';
@@ -38,6 +39,8 @@ export default function MainScreen() {
           <SignMessageButton message={memoText}>Sign Message</SignMessageButton> */}
           <Divider style={styles.spacer} />
           <MintTokenButton />
+          <Divider style={styles.spacer} />
+          <NFTGrid />
 
         </ScrollView>
         {accounts && selectedAccount ? (

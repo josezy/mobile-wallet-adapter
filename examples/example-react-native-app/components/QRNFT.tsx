@@ -5,8 +5,10 @@ import { Button, Dialog, Paragraph, Portal, Text } from 'react-native-paper';
 import QRCode from 'react-native-qrcode-svg';
 import { INFT } from './NFTGrid';
 
-// import useAuthorization from '../utils/useAuthorization';
-// import useGuardedCallback from '../utils/useGuardedCallback';
+import useAuthorization from '../utils/useAuthorization';
+import useGuardedCallback from '../utils/useGuardedCallback';
+import { transact } from '@solana-mobile/mobile-wallet-adapter-protocol-web3js';
+import { fromUint8Array } from 'js-base64';
 // import { SnackbarContext } from './SnackbarProvider';
 
 
@@ -16,57 +18,42 @@ type Props = Readonly<{
 }>;
 
 export default function QRNFT({ children, nft }: Props) {
-  // const { authorizeSession, selectedAccount } = useAuthorization();
-  // const { connection } = useConnection();
-  // const setSnackbarProps = useContext(SnackbarContext);
+  const { authorizeSession, selectedAccount } = useAuthorization();
+
   const [showDialog, setShowDialog] = useState(false);
   const [qrString, setQrString] = useState('');
 
-  // const guardedCallback = useGuardedCallback(
-  //   async (): Promise<boolean> => {
-  //     const signedTx = await transact(async wallet => {
-  //       const [freshAccount, latestBlockhash] = await Promise.all([
-  //         authorizeSession(wallet),
-  //         connection.getLatestBlockhash(),
-  //       ]);
+  const guardedCallback = useGuardedCallback(
+    async (): Promise<string> => {
+      const [signature, message] = await transact(async (wallet): Promise<[string, string]> => {
 
-  //       // const lePK = selectedAccount?.publicKey ?? freshAccount.publicKey
-  //       // const res = await axios.get(
-  //       //   `http://192.168.195.225:3000/api/hello?wallet=${lePK.toString()}`
-  //       // )
-  //       // const { encodedTx } = res.data
-  //       // const tx = Transaction.from(bs58.decode(encodedTx))
+        const freshAccount = await authorizeSession(wallet);
+        const lePK = selectedAccount?.publicKey ?? freshAccount.publicKey
+        const message = `${lePK.toString()}:${nft.mint}`
 
-  //       const tx = new Transaction({
-  //         ...latestBlockhash,
-  //         feePayer: selectedAccount?.publicKey ?? freshAccount.publicKey
-  //       }).add(
-  //         new TransactionInstruction({
-  //           programId: new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"),
-  //           keys: [],
-  //           data: new TextEncoder().encode(mint.toString()) as Buffer,
-  //         })
-  //       )
+        const messageBuffer = new Uint8Array(
+          message.split('').map(c => c.charCodeAt(0)),
+        );
 
-  //       return (await wallet.signTransactions({
-  //         transactions: [tx],
-  //       }))[0];
-  //     });
+        const [signature] = await wallet.signMessages({
+          addresses: [selectedAccount?.address ?? freshAccount.address],
+          payloads: [messageBuffer],
+        })
+        return [fromUint8Array(signature), message]
+      });
 
-  //     const encodedTx = bs58.encode(signedTx.serialize())
-  //     const res = await axios.post('http://192.168.195.225:3000/api/nft', { params: { encodedTx, mint: mint.toString() } })
-  //     return res.data.success
-  //   },
-  //   [authorizeSession, connection, selectedAccount],
-  // );
+      return `${signature}:${message}`
+    },
+    [authorizeSession, selectedAccount],
+  );
 
   return (
     <>
       <View style={styles.nftContainer}>
         <TouchableHighlight
           onPress={async () => {
-            // TODO: sign message wallet:mint with guardedCallback
-            setQrString(nft.mint)
+            const generatedQrString = await guardedCallback()
+            setQrString(generatedQrString as string)
             setShowDialog(true)
           }}
           style={{ borderRadius: 10 }}
@@ -83,8 +70,8 @@ export default function QRNFT({ children, nft }: Props) {
           visible={showDialog}
           onDismiss={() => setShowDialog(false)}
         >
-          <Dialog.Content>
-            <QRCode value={qrString} size={280} />
+          <Dialog.Content style={{ height: 400 }}>
+            <QRCode value={qrString} size={290} quietZone={10} />
             <Dialog.Actions>
               <Button onPress={() => setShowDialog(false)}>
                 Close

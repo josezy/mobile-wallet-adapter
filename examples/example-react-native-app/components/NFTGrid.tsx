@@ -28,11 +28,12 @@ export default function NFTGrid({ children }: Props) {
     transact(async wallet => {
       const owner = selectedAccount?.publicKey ?? (await authorizeSession(wallet)).publicKey
       console.log("Owner", owner.toString())
-      const res = await axios.get(HELPER_API, {
+      axios.get(HELPER_API, {
         params: { owner: owner.toString() }
+      }).then((res) => {
+        if (res.data.success) setNfts(res.data.data)
+        console.log("NFTs", res.data.data)
       })
-      if (res.data.success) setNfts(res.data.data)
-      console.log("NFTs", res.data.data)
     });
   }, [authorizeSession, selectedAccount]);
 

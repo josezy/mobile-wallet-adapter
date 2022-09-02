@@ -8,7 +8,8 @@ import { INFT } from './NFTGrid';
 import useAuthorization from '../utils/useAuthorization';
 import useGuardedCallback from '../utils/useGuardedCallback';
 import { transact } from '@solana-mobile/mobile-wallet-adapter-protocol-web3js';
-import { fromUint8Array } from 'js-base64';
+import { fromUint8Array, toUint8Array } from 'js-base64';
+
 // import { SnackbarContext } from './SnackbarProvider';
 
 
@@ -31,13 +32,9 @@ export default function QRNFT({ children, nft }: Props) {
         const lePK = selectedAccount?.publicKey ?? freshAccount.publicKey
         const message = `${lePK.toString()}:${nft.mint}`
 
-        const messageBuffer = new Uint8Array(
-          message.split('').map(c => c.charCodeAt(0)),
-        );
-
         const [signature] = await wallet.signMessages({
           addresses: [selectedAccount?.address ?? freshAccount.address],
-          payloads: [messageBuffer],
+          payloads: [toUint8Array(message)],
         })
         return [fromUint8Array(signature), message]
       });
@@ -53,8 +50,10 @@ export default function QRNFT({ children, nft }: Props) {
         <TouchableHighlight
           onPress={async () => {
             const generatedQrString = await guardedCallback()
-            setQrString(generatedQrString as string)
-            setShowDialog(true)
+            if (generatedQrString) {
+              setQrString(generatedQrString as string)
+              setShowDialog(true)
+            }
           }}
           style={{ borderRadius: 10 }}
         >

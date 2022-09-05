@@ -24,7 +24,7 @@ export default function QRNFT({ children, nft }: Props) {
   const [showDialog, setShowDialog] = useState(false);
   const [qrString, setQrString] = useState('');
 
-  const guardedCallback = useGuardedCallback(
+  const generateQrString = useGuardedCallback(
     async (): Promise<string> => {
       const [signature, message] = await transact(async (wallet): Promise<[string, string]> => {
 
@@ -49,7 +49,7 @@ export default function QRNFT({ children, nft }: Props) {
       <View style={styles.nftContainer}>
         <TouchableHighlight
           onPress={async () => {
-            const generatedQrString = await guardedCallback()
+            const generatedQrString = await generateQrString()
             if (generatedQrString) {
               setQrString(generatedQrString as string)
               setShowDialog(true)

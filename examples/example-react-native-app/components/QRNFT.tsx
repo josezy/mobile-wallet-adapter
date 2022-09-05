@@ -36,7 +36,7 @@ export default function QRNFT({ children, nft }: Props) {
           addresses: [selectedAccount?.address ?? freshAccount.address],
           payloads: [toUint8Array(message)],
         })
-        return [fromUint8Array(signature), message]
+        return [fromUint8Array(signature.slice(-64)), message]
       });
 
       return `${signature}:${message}`

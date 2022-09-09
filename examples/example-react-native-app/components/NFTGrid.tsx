@@ -5,9 +5,8 @@ import { StyleSheet, View } from 'react-native';
 import { transact } from '@solana-mobile/mobile-wallet-adapter-protocol-web3js';
 import useAuthorization from '../utils/useAuthorization';
 import QRNFT from './QRNFT';
-// import useAuthorization from '../utils/useAuthorization';
-// import useGuardedCallback from '../utils/useGuardedCallback';
-// import { SnackbarContext } from './SnackbarProvider';
+import { Button } from 'react-native-paper';
+import { BASE_ENDPOINT } from '../utils/constants';
 
 export interface INFT {
   mint: string,
@@ -18,27 +17,41 @@ type Props = Readonly<{
   children?: React.ReactNode;
 }>;
 
-const HELPER_API = 'http://192.168.1.58:3000/api/metaplex'
-
 export default function NFTGrid({ children }: Props) {
   const { authorizeSession, selectedAccount } = useAuthorization();
   const [nfts, setNfts] = useState<INFT[]>([]);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+
+  const refreshNfts = async () => transact(async wallet => {
+    if (refreshing) return
+    setRefreshing(true)
+    const owner = selectedAccount?.publicKey ?? (await authorizeSession(wallet)).publicKey
+    console.log("Owner", owner.toString())
+    axios.get(`${BASE_ENDPOINT}/api/metaplex`, {
+      params: { owner: owner.toString() }
+    }).then((res) => {
+      if (res.data.success) setNfts(res.data.data)
+      console.log("NFTs", res.data.data)
+      setRefreshing(false)
+    })
+  });
 
   useEffect(() => {
-    transact(async wallet => {
-      const owner = selectedAccount?.publicKey ?? (await authorizeSession(wallet)).publicKey
-      console.log("Owner", owner.toString())
-      axios.get(HELPER_API, {
-        params: { owner: owner.toString() }
-      }).then((res) => {
-        if (res.data.success) setNfts(res.data.data)
-        console.log("NFTs", res.data.data)
-      })
-    });
+    refreshNfts()
   }, [authorizeSession, selectedAccount]);
 
   return (
     <>
+      <View style={styles.buttonGroup}>
+        <Button
+          onPress={refreshNfts}
+          mode="contained"
+          style={styles.actionButton}
+          loading={refreshing}
+        >
+          Refresh
+        </Button>
+      </View>
       <View style={styles.mintsContainer}>
         {nfts.map((nft: INFT, idx: number) => <QRNFT key={idx} nft={nft} />)}
       </View>
@@ -53,5 +66,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     flexWrap: 'wrap',
+  },
+  buttonGroup: {
+    width: '100%',
+  },
+  actionButton: {
+    width: '100%',
+    backgroundColor: 'black',
   },
 });

@@ -1,0 +1,1 @@
+export const BASE_ENDPOINT = 'http://192.168.1.58:3000'

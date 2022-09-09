@@ -1,37 +1,36 @@
 import bs58 from 'bs58';
 import axios from 'axios';
 
-import {useConnection} from '@solana/wallet-adapter-react';
+import { useConnection } from '@solana/wallet-adapter-react';
 import { SignatureResult, Transaction, RpcResponseAndContext } from '@solana/web3.js';
-import {transact} from '@solana-mobile/mobile-wallet-adapter-protocol-web3js';
-import React, {useContext} from 'react';
-import {Linking, StyleSheet, View} from 'react-native';
-import {Button} from 'react-native-paper';
+import { transact } from '@solana-mobile/mobile-wallet-adapter-protocol-web3js';
+import React, { useContext, useState } from 'react';
+import { Linking, StyleSheet, View } from 'react-native';
+import { Button } from 'react-native-paper';
 
 import useAuthorization from '../utils/useAuthorization';
 import useGuardedCallback from '../utils/useGuardedCallback';
-import {SnackbarContext} from './SnackbarProvider';
+import { SnackbarContext } from './SnackbarProvider';
 
 import { Web3MobileWallet } from '@solana-mobile/mobile-wallet-adapter-protocol-web3js';
+import { BASE_ENDPOINT } from '../utils/constants';
 
 type Props = Readonly<{
   children?: React.ReactNode;
 }>;
 
-const HELPER_API = 'http://192.168.1.58:3000/api/mint-nft'
-
-export default function MintTokenButton({children}: Props) {
-  const {authorizeSession, selectedAccount} = useAuthorization();
-  const {connection} = useConnection();
+export default function MintTokenButton({ children }: Props) {
+  const { authorizeSession, selectedAccount } = useAuthorization();
+  const { connection } = useConnection();
   const setSnackbarProps = useContext(SnackbarContext);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const mintTokenGuarded = useGuardedCallback(
     async (): Promise<string> => {
       const [signature] = await transact(async (wallet: Web3MobileWallet) => {
-        const freshAccount = await authorizeSession(wallet)
-        const owner = selectedAccount?.publicKey ?? freshAccount.publicKey
+        const owner = selectedAccount?.publicKey ?? (await authorizeSession(wallet)).publicKey
 
-        const res = await axios.get(HELPER_API, {
+        const res = await axios.get(`${BASE_ENDPOINT}/api/mint-nft`, {
           params: { owner: owner.toString() }
         })
         const transaction = Transaction.from(bs58.decode(res.data.data.transaction))
@@ -51,6 +50,8 @@ export default function MintTokenButton({children}: Props) {
       <View style={styles.buttonGroup}>
         <Button
           onPress={async () => {
+            if (loading) return
+            setLoading(true)
             const signature = await mintTokenGuarded();
             if (signature) {
               setSnackbarProps({
@@ -65,9 +66,11 @@ export default function MintTokenButton({children}: Props) {
                 children: 'NFT minted!',
               });
             }
+            setLoading(false)
           }}
           mode="contained"
           style={styles.actionButton}
+          loading={loading}
         >
           Mint NFT
         </Button>

@@ -28,7 +28,8 @@ export default function MintTokenButton({ children }: Props) {
   const mintTokenGuarded = useGuardedCallback(
     async (): Promise<string> => {
       const [signature] = await transact(async (wallet: Web3MobileWallet) => {
-        const owner = selectedAccount?.publicKey ?? (await authorizeSession(wallet)).publicKey
+        const freshAccount = await authorizeSession(wallet)
+        const owner = selectedAccount?.publicKey ?? freshAccount.publicKey
 
         const res = await axios.get(`${BASE_ENDPOINT}/api/mint-nft`, {
           params: { owner: owner.toString() }

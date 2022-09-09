@@ -1,17 +1,15 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {ScrollView, StyleSheet} from 'react-native';
-import {Appbar, Divider, Portal, Text, TextInput} from 'react-native-paper';
+import {Appbar, Divider, Portal, Text} from 'react-native-paper';
 
 import AccountInfo from '../components/AccountInfo';
 import MintTokenButton from '../components/MintTokenButton';
 import NFTGrid from '../components/NFTGrid';
-// import RecordMessageButton from '../components/RecordMessageButton';
-// import SignMessageButton from '../components/SignMessageButton';
 import useAuthorization from '../utils/useAuthorization';
 
 export default function MainScreen() {
   const {accounts, onChangeAccount, selectedAccount} = useAuthorization();
-  // const [memoText, setMemoText] = useState('');
+
   return (
     <>
       <Appbar.Header elevated mode="center-aligned">
@@ -19,24 +17,10 @@ export default function MainScreen() {
       </Appbar.Header>
       <Portal.Host>
         <ScrollView contentContainerStyle={styles.container}>
+
           <Text variant="bodyLarge">
             Welcome to my awesome candy machine
           </Text>
-          {/* <Divider style={styles.spacer} />
-          <TextInput
-            label="What's on your mind?"
-            onChangeText={text => {
-              setMemoText(text);
-            }}
-            style={styles.textInput}
-            value={memoText}
-          />
-          <Divider style={styles.spacer} />
-          <RecordMessageButton message={memoText}>
-            Record Message
-          </RecordMessageButton>
-          <Divider style={styles.spacer} />
-          <SignMessageButton message={memoText}>Sign Message</SignMessageButton> */}
           <Divider style={styles.spacer} />
           <MintTokenButton />
           <Divider style={styles.spacer} />

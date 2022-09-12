@@ -33,6 +33,8 @@ export default function NFTGrid({ children }: Props) {
       if (res.data.success) setNfts(res.data.data)
       console.log("NFTs", res.data.data)
       setRefreshing(false)
+    }).catch(() => {
+      setRefreshing(false)
     })
   });
 

@@ -24,10 +24,11 @@ export default function FundAccountButton({children, publicKey}: Props) {
       publicKey,
       LAMPORTS_PER_AIRDROP,
     );
-    return await connection.confirmTransaction(signature, 'finalized');
+    return await connection.confirmTransaction(signature);
   }, [connection]);
   return (
     <Button
+      icon="hand-coin-outline"
       mode="elevated"
       loading={airdropInProgress}
       onPress={async () => {

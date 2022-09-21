@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {ConnectionProvider} from '@solana/wallet-adapter-react';
-import {clusterApiUrl, PublicKey, PublicKeyInitData} from '@solana/web3.js';
-import React, {Suspense} from 'react';
+import { ConnectionProvider } from '@solana/wallet-adapter-react';
+import { clusterApiUrl, PublicKey, PublicKeyInitData } from '@solana/web3.js';
+import React, { Suspense } from 'react';
 import {
   ActivityIndicator,
   AppState,
@@ -9,11 +9,13 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import {Provider as PaperProvider} from 'react-native-paper';
-import {Cache, SWRConfig} from 'swr';
+import { Provider as PaperProvider } from 'react-native-paper';
+import { Cache, SWRConfig } from 'swr';
 
 import SnackbarProvider from './components/SnackbarProvider';
 import MainScreen from './screens/MainScreen';
+
+import './shim'
 
 const DEVNET_ENDPOINT = /*#__PURE__*/ clusterApiUrl('devnet');
 
@@ -40,7 +42,7 @@ function asyncStorageProvider() {
   let storedAppCache;
   try {
     storedAppCache = JSON.parse(initialCacheFetchResult, cacheReviver);
-  } catch {}
+  } catch { }
   const map = new Map(storedAppCache || []);
   initialCacheFetchResult = undefined;
   function persistCache() {
@@ -61,7 +63,7 @@ function asyncStorageProvider() {
 export default function App() {
   return (
     <ConnectionProvider
-      config={{commitment: 'processed'}}
+      config={{ commitment: 'processed' }}
       endpoint={DEVNET_ENDPOINT}>
       <SafeAreaView style={styles.shell}>
         <PaperProvider>
@@ -75,7 +77,7 @@ export default function App() {
                   />
                 </View>
               }>
-              <SWRConfig value={{provider: asyncStorageProvider}}>
+              <SWRConfig value={{ provider: asyncStorageProvider }}>
                 <MainScreen />
               </SWRConfig>
             </Suspense>

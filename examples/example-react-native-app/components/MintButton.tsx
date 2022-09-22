@@ -25,7 +25,7 @@ type Props = Readonly<{
 const candyMachineId = new PublicKey('4muNoMvUbLFi8btqE8QV2YnsFYF2qUQ6tb9xVyHSUPFj')
 
 export default function MintButton({ children }: Props) {
-  const { authorizeSession } = useAuthorization();
+  const { authorizeSession, selectedAccount } = useAuthorization();
   const { connection } = useConnection();
   const setSnackbarProps = useContext(SnackbarContext);
 
@@ -75,7 +75,7 @@ export default function MintButton({ children }: Props) {
     <>
       <View style={styles.buttonGroup}>
         <Button
-          // disabled={!message}
+          disabled={!selectedAccount}
           loading={mintingInProcess}
           onPress={async () => {
             if (mintingInProcess) {

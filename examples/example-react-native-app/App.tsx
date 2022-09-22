@@ -63,7 +63,7 @@ function asyncStorageProvider() {
 export default function App() {
   return (
     <ConnectionProvider
-      config={{ commitment: 'processed' }}
+      config={{ commitment: 'confirmed' }}
       endpoint={DEVNET_ENDPOINT}>
       <SafeAreaView style={styles.shell}>
         <PaperProvider>

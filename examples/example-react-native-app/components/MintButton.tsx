@@ -17,6 +17,7 @@ import useGuardedCallback from '../utils/useGuardedCallback';
 import { getCandyMachineState, mintOneToken } from "../utils/candy-machine";
 import { SnackbarContext } from "./SnackbarProvider";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
+import { Base64EncodedAddress } from "@solana-mobile/mobile-wallet-adapter-protocol";
 
 type Props = Readonly<{
   children?: React.ReactNode;
@@ -71,6 +72,15 @@ export default function MintButton({ children }: Props) {
     },
     [authorizeSession, connection],
   );
+
+  const mintFromSignature = useGuardedCallback(
+    async (signature: Base64EncodedAddress): Promise<Base64EncodedAddress | null> => {
+      const tx = await connection.getTransaction(signature)
+      const postTokenBalances = tx?.meta?.postTokenBalances
+      if (!postTokenBalances || postTokenBalances.length != 1) return null
+      return postTokenBalances[0].mint
+    }
+  )
   return (
     <>
       <View style={styles.buttonGroup}>
@@ -96,13 +106,15 @@ export default function MintButton({ children }: Props) {
                       (err instanceof Error ? err.message : err),
                   });
                 } else {
+                  const mint = await mintFromSignature(signature)
                   setSnackbarProps({
                     action: {
-                      label: 'View tx',
+                      label: mint ? 'View NFT' : 'View txn',
                       onPress() {
+                        const baseUrl = mint ? 'https://www.solaneyes.com/address/' : 'https://explorer.solana.com/tx/'
                         const explorerUrl =
-                          'https://explorer.solana.com/tx/' +
-                          signature +
+                          baseUrl +
+                          (mint ?? signature) +
                           '?cluster=' +
                           WalletAdapterNetwork.Devnet;
                         Linking.openURL(explorerUrl);
